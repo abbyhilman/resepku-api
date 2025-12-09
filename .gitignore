@@ -5,6 +5,11 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.supabase
+
+# Migration scripts (temporary)
+migrate-supabase.js
+seed-supabase.js
 
 # Logs
 logs/
