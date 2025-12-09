@@ -83,14 +83,33 @@ app.get('/', (req, res) => {
     res.status(200).json({
         message: 'Welcome to the Recipe API v1',
         version: '1.0.0',
-        // endpoints: {
-        //     auth: '/api/v1/auth',
-        //     recipes: '/api/v1/recipes',
-        //     search: '/api/v1/search',
-        //     reviews: '/api/v1/recipes/:id/reviews',
-        //     saved: '/api/v1/users/saved'
-        // }
     });
+});
+
+// Health check endpoint for debugging
+app.get('/health', async (req, res) => {
+    try {
+        const pool = require('./config/database');
+        const result = await pool.query('SELECT COUNT(*) as count FROM recipes');
+        res.status(200).json({
+            status: 'ok',
+            database: 'connected',
+            recipes_count: result.rows[0].count,
+            db_host: process.env.DB_HOST ? 'set' : 'missing',
+            db_user: process.env.DB_USER ? 'set' : 'missing',
+            db_password: process.env.DB_PASSWORD ? 'set' : 'missing',
+            node_env: process.env.NODE_ENV
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: error.message,
+            db_host: process.env.DB_HOST ? 'set' : 'missing',
+            db_user: process.env.DB_USER ? 'set' : 'missing',
+            db_password: process.env.DB_PASSWORD ? 'set' : 'missing',
+            node_env: process.env.NODE_ENV
+        });
+    }
 });
 
 // ============================================
