@@ -101,24 +101,30 @@ app.get('/', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Initialize database and start server
-async function startServer() {
-    try {
-        // Initialize database tables
-        await initializeDatabase();
-
-        // Start server
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-            console.log(`📊 Database: ${process.env.DB_NAME} at ${process.env.DB_HOST}`);
-            console.log(`🔗 API Documentation: http://localhost:${PORT}/`);
-            console.log(`🔒 Security: Helmet, Rate Limiting, XSS Protection enabled`);
-            console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
+// Initialize database tables on first request (for serverless)
+let isDbInitialized = false;
+app.use(async (req, res, next) => {
+    if (!isDbInitialized) {
+        try {
+            await initializeDatabase();
+            isDbInitialized = true;
+        } catch (error) {
+            console.error('Database initialization failed:', error);
+        }
     }
+    next();
+});
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server is running on port ${PORT}`);
+        console.log(`📊 Database: ${process.env.DB_NAME} at ${process.env.DB_HOST}`);
+        console.log(`🔗 API Documentation: http://localhost:${PORT}/`);
+        console.log(`🔒 Security: Helmet, Rate Limiting, XSS Protection enabled`);
+        console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
 }
 
-startServer();
+// Export for Vercel serverless
+module.exports = app;
