@@ -1,0 +1,18 @@
+{
+    "title": "Nasi Goreng Spesial Image",
+    "description": "Nasi goreng dengan bumbu rahasia yang lezat dan mudah dibuat",
+    "prep_time_min": 25,
+    "image_url": "https://images.unsplash.com/photo-1680674814945-7945d913319c?q=80&w=2070&auto=format&fit=crop",
+    "ingredients": [
+        {
+            "name": "Nasi putih",
+            "quantity": "3",
+            "unit": "piring"
+        }
+    ],
+    "steps": [
+        {
+            "instruction": "Masak nasi goreng"
+        }
+    ]
+}

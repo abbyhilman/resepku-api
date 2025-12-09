@@ -1,0 +1,495 @@
+{
+    "info": {
+        "name": "Recipe API",
+        "description": "Complete API collection for Recipe Backend",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"full_name\": \"John Doe\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user with email, password, and full name"
+                    }
+                },
+                {
+                    "name": "Login User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.data.token) {",
+                                    "    pm.collectionVariables.set(\"token\", jsonData.data.token);",
+                                    "    console.log(\"Token saved:\", jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login and get JWT token (automatically saved to collection variable)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Recipes",
+            "item": [
+                {
+                    "name": "Get All Recipes",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/recipes?limit=10&offset=0",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Number of recipes per page"
+                                },
+                                {
+                                    "key": "offset",
+                                    "value": "0",
+                                    "description": "Pagination offset"
+                                },
+                                {
+                                    "key": "prep_time_min",
+                                    "value": "30",
+                                    "disabled": true,
+                                    "description": "Filter by max prep time"
+                                },
+                                {
+                                    "key": "average_rating",
+                                    "value": "4.0",
+                                    "disabled": true,
+                                    "description": "Filter by min rating"
+                                }
+                            ]
+                        },
+                        "description": "Get list of recipes with pagination and optional filters"
+                    }
+                },
+                {
+                    "name": "Get Recipe by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/recipes/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes",
+                                "1"
+                            ]
+                        },
+                        "description": "Get detailed recipe information including ingredients and steps"
+                    }
+                },
+                {
+                    "name": "Get Recipes (Filtered by Prep Time)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/recipes?prep_time_min=30",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes"
+                            ],
+                            "query": [
+                                {
+                                    "key": "prep_time_min",
+                                    "value": "30"
+                                }
+                            ]
+                        },
+                        "description": "Get recipes with preparation time <= 30 minutes"
+                    }
+                },
+                {
+                    "name": "Get Recipes (Filtered by Rating)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/recipes?average_rating=4.5",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes"
+                            ],
+                            "query": [
+                                {
+                                    "key": "average_rating",
+                                    "value": "4.5"
+                                }
+                            ]
+                        },
+                        "description": "Get recipes with rating >= 4.5"
+                    }
+                },
+                {
+                    "name": "Create Recipe",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Nasi Goreng Spesial\",\n  \"description\": \"Nasi goreng lezat\",\n  \"prep_time_min\": 20,\n  \"image_url\": \"https://images.unsplash.com/photo-1680674814945-7945d913319c?q=80&w=2070&auto=format&fit=crop\",\n  \"ingredients\": [\n    {\n      \"name\": \"Nasi\",\n      \"quantity\": \"1\",\n      \"unit\": \"piring\"\n    }\n  ],\n  \"steps\": [\n    {\n      \"instruction\": \"Goreng nasi\"\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/recipes",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes"
+                            ]
+                        },
+                        "description": "Create a new recipe with ingredients and steps"
+                    }
+                },
+                {
+                    "name": "Update Recipe",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Nasi Goreng Spesial Updated\",\n  \"prep_time_min\": 25,\n  \"image_url\": \"https://images.unsplash.com/photo-1680674814945-7945d913319c?q=80&w=2070&auto=format&fit=crop\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/recipes/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes",
+                                "1"
+                            ]
+                        },
+                        "description": "Update an existing recipe (partial update supported)"
+                    }
+                },
+                {
+                    "name": "Delete Recipe",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/recipes/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes",
+                                "1"
+                            ]
+                        },
+                        "description": "Delete a recipe by ID"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Search",
+            "item": [
+                {
+                    "name": "Search Recipes",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/search?q=ayam",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "ayam",
+                                    "description": "Search keyword"
+                                }
+                            ]
+                        },
+                        "description": "Search recipes by title, description, or ingredient name"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Reviews",
+            "item": [
+                {
+                    "name": "Create Review",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Resep yang sangat enak dan mudah dibuat!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/recipes/1/reviews",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes",
+                                "1",
+                                "reviews"
+                            ]
+                        },
+                        "description": "Create a review for a recipe (requires authentication)"
+                    }
+                },
+                {
+                    "name": "Get Reviews for Recipe",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/recipes/1/reviews",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "recipes",
+                                "1",
+                                "reviews"
+                            ]
+                        },
+                        "description": "Get all reviews for a specific recipe"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Saved Recipes",
+            "item": [
+                {
+                    "name": "Get Saved Recipes",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/users/saved",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "saved"
+                            ]
+                        },
+                        "description": "Get all saved recipes for authenticated user"
+                    }
+                },
+                {
+                    "name": "Save Recipe",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"recipe_id\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/users/saved",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "saved"
+                            ]
+                        },
+                        "description": "Save a recipe to favorites (requires authentication)"
+                    }
+                },
+                {
+                    "name": "Remove Saved Recipe",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/users/saved/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "saved",
+                                "1"
+                            ]
+                        },
+                        "description": "Remove a recipe from favorites (requires authentication)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User Management",
+            "item": [
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        },
+                        "description": "Get list of all registered users"
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/users/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "users",
+                                "1"
+                            ]
+                        },
+                        "description": "Delete a user by ID (admin only logic in real app, restricted in backend)"
+                    }
+                }
+            ]
+        }
+    ]
+}
