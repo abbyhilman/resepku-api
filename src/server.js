@@ -61,6 +61,33 @@ app.use((req, res, next) => {
 });
 
 // ============================================
+// DATABASE INITIALIZATION (MUST BE BEFORE ROUTES)
+// ============================================
+
+// Initialize database tables on first request (for serverless)
+let isDbInitialized = false;
+app.use(async (req, res, next) => {
+    if (!isDbInitialized) {
+        try {
+            console.log('🔄 Initializing database...');
+            await initializeDatabase();
+            isDbInitialized = true;
+            console.log('✅ Database initialized successfully');
+        } catch (error) {
+            console.error('❌ Database initialization failed:', error);
+            return res.status(500).json({
+                error: {
+                    code: 500,
+                    message: 'Database initialization failed',
+                    details: error.message
+                }
+            });
+        }
+    }
+    next();
+});
+
+// ============================================
 // ROUTES
 // ============================================
 
@@ -119,20 +146,6 @@ app.get('/health', async (req, res) => {
 // --- Middleware Error Handling ---
 app.use(notFoundHandler);
 app.use(errorHandler);
-
-// Initialize database tables on first request (for serverless)
-let isDbInitialized = false;
-app.use(async (req, res, next) => {
-    if (!isDbInitialized) {
-        try {
-            await initializeDatabase();
-            isDbInitialized = true;
-        } catch (error) {
-            console.error('Database initialization failed:', error);
-        }
-    }
-    next();
-});
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
